@@ -18,7 +18,8 @@ pdfmetrics.registerFont(TTFont("THSarabun-Bold", "THSarabunNew Bold001.ttf"))
 st.set_page_config(page_title="ตัวแปลง Excel → PDF (ฟอนต์ไทย)", layout="centered")
 
 st.markdown("## 🧾 ตัวแปลง Excel → PDF (ใช้ฟอนต์ภาษาไทย)")
-uploaded_file = st.file_uploader("📂 อัปโหลดไฟล์ Excel", type=["xlsx"])
+uploaded_file = st.file_uploader("📂 อัปโหลดไฟล์ Excel", type=["xlsx", "xls"])
+
 
 if uploaded_file:
     df = pd.read_excel(uploaded_file)
