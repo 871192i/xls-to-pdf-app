@@ -1,28 +1,55 @@
-import os
-import tempfile
+
 import streamlit as st
-from xlsx2html import xlsx2html
-import pdfkit
+import pandas as pd
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+from reportlab.lib.pagesizes import A4
+from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.pdfbase import pdfmetrics
+import os
 
-st.set_page_config(page_title="🔄 แปลง Excel เป็น PDF", page_icon="📄")
-st.title("📄 ตัวแปลง Excel → PDF (ใช้งานผ่านเว็บ)")
+# ลงทะเบียนฟอนต์ภาษาไทย
+font_path = "NotoSansThai-Regular.ttf"
+font_bold_path = "NotoSansThai-Bold.ttf"
+pdfmetrics.registerFont(TTFont("NotoSansThai", font_path))
+pdfmetrics.registerFont(TTFont("NotoSansThai-Bold", font_bold_path))
 
+st.set_page_config(page_title="ตัวแปลง Excel → PDF (ฟอนต์ไทย)", layout="centered")
+
+st.markdown("## 🧾 ตัวแปลง Excel → PDF (ใช้ฟอนต์ภาษาไทย)")
 uploaded_file = st.file_uploader("📂 อัปโหลดไฟล์ Excel", type=["xlsx"])
 
-if uploaded_file and st.button("🚀 เริ่มแปลง"):
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".xlsx") as tmp:
-        tmp.write(uploaded_file.getbuffer())
-        temp_excel_path = tmp.name
+if uploaded_file:
+    df = pd.read_excel(uploaded_file)
+    st.success("📄 โหลดข้อมูลสำเร็จ")
+    st.dataframe(df)
 
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".html") as html_file:
-        xlsx2html(temp_excel_path, html_file.name)
-        html_path = html_file.name
+    if st.button("📤 สร้าง PDF"):
+        pdf_path = "output.pdf"
+        doc = SimpleDocTemplate(pdf_path, pagesize=A4)
+        elements = []
 
-    pdf_path = html_path.replace(".html", ".pdf")
-    try:
-        pdfkit.from_file(html_path, pdf_path)
+        styles = getSampleStyleSheet()
+        styles.add(ParagraphStyle(name='ThaiStyle', fontName="NotoSansThai", fontSize=14))
+
+        elements.append(Paragraph("รายงานจาก Excel (ภาษาไทย)", styles['ThaiStyle']))
+        elements.append(Spacer(1, 12))
+
+        data = [df.columns.tolist()] + df.values.tolist()
+        table = Table(data, hAlign='LEFT')
+        table.setStyle(TableStyle([
+            ('FONTNAME', (0, 0), (-1, 0), 'NotoSansThai-Bold'),
+            ('FONTNAME', (0, 1), (-1, -1), 'NotoSansThai'),
+            ('FONTSIZE', (0, 0), (-1, -1), 12),
+            ('BACKGROUND', (0, 0), (-1, 0), colors.darkblue),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+            ('GRID', (0, 0), (-1, -1), 1, colors.black),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER')
+        ]))
+
+        elements.append(table)
+        doc.build(elements)
+
         with open(pdf_path, "rb") as f:
-            st.success("✅ แปลงสำเร็จ!")
-            st.download_button("📥 ดาวน์โหลด PDF", f, file_name="converted.pdf", mime="application/pdf")
-    except Exception as e:
-        st.error(f"❌ แปลงไม่สำเร็จ: {e}")
+            st.download_button("📥 ดาวน์โหลด PDF", f, file_name="excel_report.pdf")
