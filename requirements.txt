@@ -1,5 +1,6 @@
 streamlit
-xlsx2html
-pdfkit
+pandas
 reportlab
+openpyxl
 xlrd
+
