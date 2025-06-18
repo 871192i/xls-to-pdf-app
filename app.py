@@ -10,10 +10,10 @@ from reportlab.pdfbase import pdfmetrics
 import os
 
 # ลงทะเบียนฟอนต์ภาษาไทย
-font_path = "NotoSansThai-Regular.ttf"
-font_bold_path = "NotoSansThai-Bold.ttf"
-pdfmetrics.registerFont(TTFont("NotoSansThai", font_path))
-pdfmetrics.registerFont(TTFont("NotoSansThai-Bold", font_bold_path))
+# font_path = "NotoSansThai-Regular.ttf"
+# font_bold_path = "NotoSansThai-Bold.ttf"
+pdfmetrics.registerFont(TTFont("Sarabun", "Sarabun-Regular.ttf"))
+pdfmetrics.registerFont(TTFont("Sarabun-Bold", "Sarabun-Bold.ttf"))
 
 st.set_page_config(page_title="ตัวแปลง Excel → PDF (ฟอนต์ไทย)", layout="centered")
 
@@ -31,7 +31,7 @@ if uploaded_file:
         elements = []
 
         styles = getSampleStyleSheet()
-        styles.add(ParagraphStyle(name='ThaiStyle', fontName="NotoSansThai", fontSize=14))
+        styles.add(ParagraphStyle(name='ThaiStyle', fontName="Sarabun", fontSize=14))
 
         elements.append(Paragraph("รายงานจาก Excel (ภาษาไทย)", styles['ThaiStyle']))
         elements.append(Spacer(1, 12))
@@ -39,8 +39,8 @@ if uploaded_file:
         data = [df.columns.tolist()] + df.values.tolist()
         table = Table(data, hAlign='LEFT')
         table.setStyle(TableStyle([
-            ('FONTNAME', (0, 0), (-1, 0), 'NotoSansThai-Bold'),
-            ('FONTNAME', (0, 1), (-1, -1), 'NotoSansThai'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Sarabun-Bold'),
+            ('FONTNAME', (0, 1), (-1, -1), 'Sarabun'),
             ('FONTSIZE', (0, 0), (-1, -1), 12),
             ('BACKGROUND', (0, 0), (-1, 0), colors.darkblue),
             ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
