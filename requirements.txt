@@ -2,3 +2,4 @@ streamlit
 xlsx2html
 pdfkit
 reportlab
+xlrd
